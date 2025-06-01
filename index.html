@@ -3,84 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dermatologie Lernkarten</title>
+    <title>Dermatologie Multiple-Choice Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light blue-gray background */
+            background-color: #f0f4f8;
+            color: #333;
         }
-        .flashcard {
+        .quiz-container {
             background-color: white;
-            border-radius: 12px; /* More rounded corners */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
-            margin-bottom: 20px;
-            transition: all 0.3s ease-in-out;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
         }
-        .flashcard-question {
-            padding: 20px;
-            font-weight: 600;
-            font-size: 1.1rem; /* Slightly larger question text */
-            color: #1e3a8a; /* Dark blue for questions */
+        .question-title {
+            color: #1e3a8a;
+        }
+        .options-container label {
+            display: block;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
             cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e5e7eb; /* Separator line */
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
-        .flashcard-question.open {
-             border-bottom: 1px solid #93c5fd; /* Blue separator when open */
+        .options-container label:hover {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
         }
-        .flashcard-answer {
-            padding: 0 20px; /* Padding only left/right initially */
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
-            font-size: 0.95rem;
-            color: #374151; /* Dark gray for answers */
-            line-height: 1.6;
+        .options-container input[type="radio"] {
+            margin-right: 10px;
+            accent-color: #3b82f6;
         }
-        .flashcard-answer.open {
-            padding: 20px; /* Full padding when open */
-            max-height: 1000px; /* Large enough to show content */
+        .options-container input[type="radio"]:disabled + span {
+            color: #6b7280;
         }
-        .arrow {
-            transition: transform 0.3s ease-in-out;
-            color: #3b82f6; /* Blue arrow */
+        .options-container label.correct {
+            background-color: #d1fae5;
+            border-color: #6ee7b7;
         }
-        .arrow.open {
-            transform: rotate(90deg);
+        .options-container label.incorrect {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+        }
+        .explanation-area {
+            background-color: #eef2ff;
+            border: 1px solid #c7d2fe;
+            margin-top: 1.5rem;
+        }
+        .explanation-text {
+            color: #374151;
+        }
+        .feedback-text {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .feedback-text.correct {
+            color: #059669;
+        }
+        .feedback-text.incorrect {
+            color: #ef4444;
+        }
+        .btn {
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        .btn:active:not(:disabled) {
+            transform: translateY(0px);
+        }
+        .btn-prev { background-color: #6b7280; }
+        .btn-prev:hover:not(:disabled) { background-color: #4b5563; }
+        .btn-check-answer { background-color: #3b82f6; }
+        .btn-check-answer:hover:not(:disabled) { background-color: #2563eb; }
+        .btn-next { background-color: #10b981; }
+        .btn-next:hover:not(:disabled) { background-color: #059669; }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         .footer-text {
             font-size: 0.8rem;
             color: #6b7280;
         }
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div class="container mx-auto max-w-3xl">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-blue-700">Dermatologie Lernkarten</h1>
-            <p class="text-lg text-gray-600 mt-2">Ihr Helfer für die Kosmetikprüfung</p>
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-700">Dermatologie Multiple-Choice Quiz</h1>
+            <p class="text-lg text-gray-600 mt-2">Testen Sie Ihr Wissen für die Kosmetikprüfung</p>
         </header>
 
-        <div id="flashcard-container">
+        <div id="quiz-main-container">
+            <div id="quiz-container" class="quiz-container p-6 md:p-8 rounded-xl shadow-xl max-w-2xl mx-auto">
+                <div id="question-header" class="mb-4">
+                    <p id="question-counter" class="text-md font-medium text-blue-600 text-center"></p>
+                </div>
+                <div id="question-area" class="mb-6">
+                    <h2 id="question-title" class="question-title text-xl md:text-2xl font-semibold mb-5"></h2>
+                    <div id="options-container" class="options-container space-y-3">
+                        </div>
+                </div>
+                <div id="feedback-area" class="hidden mt-4">
+                    <p id="feedback-text" class="feedback-text"></p>
+                </div>
+                <div id="explanation-area" class="explanation-area hidden p-4 rounded-lg">
+                    <h3 class="font-semibold text-lg mb-2 text-blue-700">Erläuterung:</h3>
+                    <p id="explanation-text" class="explanation-text text-sm md:text-base"></p>
+                </div>
+                <div id="controls" class="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 sm:space-x-3">
+                    <button id="prev-btn" class="btn btn-prev w-full sm:w-auto text-white font-semibold py-2.5 px-5 rounded-lg">
+                        Vorherige
+                    </button>
+                    <button id="check-answer-btn" class="btn btn-check-answer w-full sm:w-auto text-white font-semibold py-2.5 px-5 rounded-lg">
+                        Antwort prüfen
+                    </button>
+                    <button id="next-btn" class="btn btn-next w-full sm:w-auto text-white font-semibold py-2.5 px-5 rounded-lg">
+                        Nächste
+                    </button>
+                </div>
             </div>
+        </div>
 
         <footer class="text-center mt-12 py-6 border-t border-gray-300">
             <p class="footer-text">BKM Akademie - Viel Erfolg bei Ihrer Prüfung!</p>
@@ -92,145 +146,407 @@
         const flashcardsData = [
             {
                 question: "Nennen Sie die fünf Schichten der Epidermis (Deutsch und Latein)!",
-                answer: "<ul><li>Basalzellenschicht - Stratum basale</li><li>Stachelzellenschicht - Stratum spinosum</li><li>Körnerzellenschicht - Stratum granulosum</li><li>Leucht- oder Glanzschicht - Stratum lucidum (nur Fusssohlen und Handfläche)</li><li>Hornschicht - Stratum corneum</li></ul>"
+                options: [
+                    { text: "Basalzellenschicht (Stratum basale), Stachelzellenschicht (Stratum spinosum), Körnerzellenschicht (Stratum granulosum), Leucht-/Glanzschicht (Stratum lucidum), Hornschicht (Stratum corneum)", isCorrect: true },
+                    { text: "Papillarschicht (Stratum papillare), Netzschicht (Stratum reticulare), Fettzellenschicht (Stratum adiposum), Muskelschicht (Stratum musculare), Bindegewebsschicht (Stratum textus connectivus)", isCorrect: false },
+                    { text: "Oberhaut (Epidermis), Lederhaut (Dermis), Unterhaut (Subcutis), Schleimhaut (Mucosa), Knorpelschicht (Stratum cartilagineum)", isCorrect: false },
+                    { text: "Stratum superficiale, Stratum profundum, Stratum pigmentosum, Stratum vasculare, Stratum nervosum", isCorrect: false }
+                ],
+                explanation: "Die fünf Schichten der Epidermis sind: Basalzellenschicht (Stratum basale), Stachelzellenschicht (Stratum spinosum), Körnerzellenschicht (Stratum granulosum), Leucht- oder Glanzschicht (Stratum lucidum - nur an Fusssohlen und Handflächen), Hornschicht (Stratum corneum)."
             },
             {
                 question: "Erklären Sie den Weg eines Keratinozytens!",
-                answer: "Keratinozyten (90% der Epidermiszellen) erneuern sich in ca. einem Monat. <br><b>Weg:</b><br>1. <b>Stratum basale:</b> Entstehung durch Zellteilung.<br>2. <b>Stratum spinosum:</b> Synthese von Lipiden (Odland-Bodies) für Wasserschutz und Proteinen/Fetten für den Zellzusammenhalt.<br>3. <b>Stratum granulosum:</b> Abbau von Zellorganellen, Bildung von Keratohyalingranula, Beginn der Verhornung. Odland-Bodies entleeren ihren Inhalt (Barrierelipide).<br>4. <b>Stratum lucidum</b> (nur an Leistenhaut): Übergangsschicht.<br>5. <b>Stratum corneum:</b> Besteht aus abgestorbenen, verhornten Zellen (Korneozyten), die eine schützende Hornschicht bilden. Dient als Barriere gegen Wasserverlust, physikalische und chemische Noxen."
+                options: [
+                    { text: "Entstehung im Stratum basale, Wanderung durch Stratum spinosum, granulosum, (lucidum) bis zum Stratum corneum als tote Korneozyte.", isCorrect: true },
+                    { text: "Entstehung im Stratum corneum, Abstieg zum Stratum basale zur Nährstoffaufnahme, dann Ausscheidung.", isCorrect: false },
+                    { text: "Produktion in der Dermis, Aufstieg in die Epidermis zur Bildung von Melanin.", isCorrect: false },
+                    { text: "Reifung in Talgdrüsen, Ausscheidung auf die Hautoberfläche als Teil des Säureschutzmantels.", isCorrect: false }
+                ],
+                explanation: "Keratinozyten (90% der Epidermiszellen) erneuern sich in ca. einem Monat. Weg: 1. Stratum basale: Entstehung durch Zellteilung. 2. Stratum spinosum: Synthese von Lipiden (Odland-Bodies) für Wasserschutz und Proteinen/Fetten für den Zellzusammenhalt. 3. Stratum granulosum: Abbau von Zellorganellen, Bildung von Keratohyalingranula, Beginn der Verhornung. Odland-Bodies entleeren ihren Inhalt (Barrierelipide). 4. Stratum lucidum (nur an Leistenhaut): Übergangsschicht. 5. Stratum corneum: Besteht aus abgestorbenen, verhornten Zellen (Korneozyten), die eine schützende Hornschicht bilden."
             },
             {
                 question: "Beschreiben Sie Lage und Funktion der Melanozyten!",
-                answer: "<b>Lage:</b> In der Basalzellenschicht (Stratum basale) der Epidermis.<br><b>Funktion:</b> Produzieren das Pigment Melanin in speziellen Organellen, den Melanosomen. Melanin ist verantwortlich für die Haut- und Haarfarbe und bietet Schutz vor UV-Strahlung. Die Melanosomen werden an die umliegenden Keratinozyten abgegeben."
+                options: [
+                    { text: "Lage im Stratum basale der Epidermis; Funktion: Produktion von Melanin zum UV-Schutz und zur Haut-/Haarfarbe.", isCorrect: true },
+                    { text: "Lage in der Dermis; Funktion: Produktion von Kollagen für Hautelastizität.", isCorrect: false },
+                    { text: "Lage im Stratum corneum; Funktion: Bildung der obersten Hornschicht.", isCorrect: false },
+                    { text: "Lage in der Subcutis; Funktion: Speicherung von Fett und Energie.", isCorrect: false }
+                ],
+                explanation: "Lage: In der Basalzellenschicht (Stratum basale) der Epidermis. Funktion: Produzieren das Pigment Melanin in speziellen Organellen, den Melanosomen. Melanin ist verantwortlich für die Haut- und Haarfarbe und bietet Schutz vor UV-Strahlung. Die Melanosomen werden an die umliegenden Keratinozyten abgegeben."
             },
             {
                 question: "Was ist die Basalmembran und ihre Rolle bei Verletzung/Hautkrebs?",
-                answer: "Die Basalmembran ist eine dünne Schicht, die die Epidermis von der Dermis trennt.<br><b>Rolle bei Verletzung/Wundheilung:</b> Ihre Intaktheit ist entscheidend für eine vollständige, narbenfreie Heilung. Bei Zerstörung der Basalmembran entsteht eine Narbe.<br><b>Rolle bei Hautkrebs:</b> Ein maligner (bösartiger) Tumor muss die Basalmembran durchbrechen, um invasiv in tiefere Hautschichten zu wachsen und Metastasen (Tochtergeschwülste) bilden zu können."
+                options: [
+                    { text: "Trennschicht zwischen Epidermis und Dermis; wichtig für narbenfreie Heilung und als Barriere gegen invasive Tumore.", isCorrect: true },
+                    { text: "Die oberste Schicht der Epidermis, zuständig für den Schutz vor äußeren Einflüssen.", isCorrect: false },
+                    { text: "Eine Schicht in der Subcutis, die für die Wärmeisolation sorgt.", isCorrect: false },
+                    { text: "Ein Teil der Haarwurzel, der für das Haarwachstum verantwortlich ist.", isCorrect: false }
+                ],
+                explanation: "Die Basalmembran ist eine dünne Schicht, die die Epidermis von der Dermis trennt. Rolle bei Verletzung/Wundheilung: Ihre Intaktheit ist entscheidend für eine vollständige, narbenfreie Heilung. Bei Zerstörung der Basalmembran entsteht eine Narbe. Rolle bei Hautkrebs: Ein maligner (bösartiger) Tumor muss die Basalmembran durchbrechen, um invasiv in tiefere Hautschichten zu wachsen und Metastasen bilden zu können."
             },
             {
                 question: "Nennen Sie wichtige Aufgaben der Haut!",
-                answer: "<ul><li><b>Schutzfunktion:</b> Vor physikalischen Einflüssen (UV-Strahlung, Druck, Reibung), chemischen Substanzen und biologischen Noxen (Bakterien, Viren, Pilze).</li><li><b>Thermoregulation:</b> Aufrechterhaltung der Körpertemperatur durch Schwitzen und Verengung/Erweiterung der Blutgefäße.</li><li><b>Sinneswahrnehmung:</b> Aufnahme von Reizen wie Berührung, Druck, Schmerz, Temperatur.</li><li><b>Stoffwechsel und Speicher:</b> Produktion von Vitamin D3 unter Sonneneinstrahlung, Speicherung von Fett und Wasser.</li><li><b>Immunabwehr:</b> Enthält Zellen des Immunsystems (z.B. Langerhans-Zellen).</li><li><b>Kommunikation und Repräsentation:</b> Aussehen, Geruch.</li><li><b>Ausscheidungsfunktion:</b> Über Schweiß werden geringe Mengen an Stoffwechselprodukten ausgeschieden.</li></ul>"
+                options: [
+                    { text: "Schutzfunktion, Thermoregulation, Sinneswahrnehmung, Stoffwechsel (Vitamin D), Immunabwehr.", isCorrect: true },
+                    { text: "Nur Produktion von Schweiß und Talg.", isCorrect: false },
+                    { text: "Ausschließlich Atmung und Sauerstoffaufnahme.", isCorrect: false },
+                    { text: "Speicherung von Nährstoffen und Produktion von Blutzellen.", isCorrect: false }
+                ],
+                explanation: "Wichtige Aufgaben der Haut: Schutzfunktion (vor UV, Chemikalien, Pathogenen), Thermoregulation, Sinneswahrnehmung (Tastsinn, Temperatur, Schmerz), Stoffwechsel und Speicher (Vitamin D3-Synthese, Fettspeicherung), Immunabwehr (Langerhans-Zellen), Kommunikation und Repräsentation, Ausscheidungsfunktion (via Schweiß)."
             },
-            {
+             {
                 question: "Woraus besteht der Säureschutzmantel der Haut?",
-                answer: "Der Säureschutzmantel ist ein Hydrolipidfilm auf der Hautoberfläche mit einem leicht sauren pH-Wert (ca. 4,5 - 5,5).<br><b>Bestandteile:</b><br><ul><li><b>Schweiß:</b> Wasser, Salze, Milchsäure, Harnstoff, Aminosäuren.</li><li><b>Talg:</b> Lipide wie Triglyceride, Fettsäuren, Wachsester, Squalen.</li><li><b>Abbauprodukte des Verhornungsprozesses:</b> z.B. freie Aminosäuren (NMF - Natural Moisturizing Factors).</li></ul>Er wirkt keimabwehrend und schützt die Haut vor Austrocknung."
+                options: [
+                    { text: "Aus Schweiß, Talg und Abbauprodukten der Verhornung (z.B. NMF).", isCorrect: true },
+                    { text: "Ausschließlich aus Wasser und Salzen.", isCorrect: false },
+                    { text: "Aus reinen Lipiden und Proteinen der Dermis.", isCorrect: false },
+                    { text: "Aus Melanin und Keratin.", isCorrect: false }
+                ],
+                explanation: "Der Säureschutzmantel ist ein Hydrolipidfilm (pH ca. 4,5-5,5). Bestandteile: Schweiß (Wasser, Salze, Milchsäure, Harnstoff), Talg (Lipide), Abbauprodukte des Verhornungsprozesses (z.B. freie Aminosäuren - NMF). Er wirkt keimabwehrend und schützt vor Austrocknung."
             },
             {
                 question: "Wie heißen die beiden Schichten der Dermis und deren Aufgabe?",
-                answer: "1. <b>Stratum papillare (Papillarschicht):</b> Die obere, an die Epidermis grenzende Schicht. Enthält lockeres Bindegewebe, Blutkapillaren zur Versorgung der Epidermis, Nervenendigungen und Meissner-Tastkörperchen. Ihre zapfenartigen Ausstülpungen (Papillen) verzahnen sich mit der Epidermis.<br>2. <b>Stratum reticulare (Netzschicht):</b> Die untere, dickere Schicht. Besteht aus straffem Bindegewebe mit Kollagen- und elastischen Fasern, die der Haut Reißfestigkeit und Elastizität verleihen. Enthält Blutgefäße, Lymphgefäße, Nerven, Haarwurzeln, Talg- und Schweißdrüsen."
+                options: [
+                    { text: "Stratum papillare (Versorgung Epidermis, Tastempfindung) und Stratum reticulare (Reißfestigkeit, Elastizität).", isCorrect: true },
+                    { text: "Stratum basale (Zellteilung) und Stratum corneum (Hornschicht).", isCorrect: false },
+                    { text: "Epidermis (Oberhaut) und Subcutis (Unterhaut).", isCorrect: false },
+                    { text: "Stratum lucidum (Glanzschicht) und Stratum granulosum (Körnerschicht).", isCorrect: false }
+                ],
+                explanation: "1. Stratum papillare (Papillarschicht): Obere Schicht, versorgt Epidermis, enthält Tastkörperchen. 2. Stratum reticulare (Netzschicht): Untere, dickere Schicht, verleiht Reißfestigkeit und Elastizität durch Kollagen- und elastische Fasern."
             },
             {
                 question: "Welche drei Pigmente bestimmen die Hautfarbe?",
-                answer: "1. <b>Melanin:</b> Das Hauptpigment, produziert von Melanozyten. Gibt es in zwei Formen (Eumelanin: braun-schwarz; Phäomelanin: rot-gelb). Schützt vor UV-Strahlung.<br>2. <b>Carotinoide:</b> Gelb-orange Pigmente, die über die Nahrung aufgenommen werden (z.B. Karotten) und sich im Fettgewebe und Stratum corneum anreichern können.<br>3. <b>Hämoglobin:</b> Der rote Blutfarbstoff in den Blutgefäßen der Dermis. Der Oxygenierungsgrad (sauerstoffreich vs. sauerstoffarm) beeinflusst den Farbton (rosig vs. bläulich)."
+                options: [
+                    { text: "Melanin, Carotinoide, Hämoglobin.", isCorrect: true },
+                    { text: "Keratin, Kollagen, Elastin.", isCorrect: false },
+                    { text: "Lipide, Proteine, Wasser.", isCorrect: false },
+                    { text: "Bilirubin, Urobilin, Sterkobilin.", isCorrect: false }
+                ],
+                explanation: "1. Melanin: Hauptpigment (braun-schwarz/rot-gelb), UV-Schutz. 2. Carotinoide: Gelb-orange Pigmente (Nahrung). 3. Hämoglobin: Roter Blutfarbstoff in der Dermis."
             },
             {
                 question: "Definieren Sie die Seborrhoe!",
-                answer: "Seborrhoe bezeichnet eine übermäßige Produktion von Talg durch die Talgdrüsen. Dies führt zu fettiger Haut und Haaren. Man unterscheidet:<br><ul><li><b>Seborrhoea oleosa:</b> fettig-ölige Haut mit erweiterten Poren.</li><li><b>Seborrhoea sicca:</b> fettige, aber gleichzeitig schuppige und oft gerötete Haut, da der Wasserhaushalt gestört ist.</li></ul>Seborrhoe kann ein Faktor bei der Entstehung von Akne sein."
+                options: [
+                    { text: "Übermäßige Produktion von Talg durch die Talgdrüsen.", isCorrect: true },
+                    { text: "Übermäßige Produktion von Schweiß.", isCorrect: false },
+                    { text: "Verminderte Talgproduktion, die zu trockener Haut führt.", isCorrect: false },
+                    { text: "Eine Entzündung der Haarfollikel.", isCorrect: false }
+                ],
+                explanation: "Seborrhoe bezeichnet eine übermäßige Produktion von Talg durch die Talgdrüsen, was zu fettiger Haut und Haaren führt. Man unterscheidet Seborrhoea oleosa (fettig-ölig) und Seborrhoea sicca (fettig-schuppig)."
             },
             {
                 question: "Nennen Sie die Hautanhangsgebilde und ihre Funktion!",
-                answer: "<ul><li><b>Haare:</b> Schutz (z.B. Kopfhaar vor Sonne, Wimpern vor Fremdkörpern), Wärmeisolation, Tastempfindung, soziale Funktion.</li><li><b>Nägel:</b> Schutz der Finger- und Zehenenden, Hilfsmittel beim Greifen und Tasten.</li><li><b>Talgdrüsen:</b> Produzieren Talg, der die Haut und Haare geschmeidig hält und Teil des Säureschutzmantels ist.</li><li><b>Schweißdrüsen:</b><br>  - <i>Ekkrine Schweißdrüsen:</i> Thermoregulation durch Verdunstungskälte, Ausscheidung, Säureschutzmantel.<br>  - <i>Apokrine Schweißdrüsen (Duftdrüsen):</i> Produzieren ein individuelles Duftsekret, das durch Bakterien zersetzt wird.</li></ul>"
+                options: [
+                    { text: "Haare (Schutz, Wärme), Nägel (Schutz, Greifen), Talgdrüsen (Fettung), Schweißdrüsen (Thermoregulation, Ausscheidung).", isCorrect: true },
+                    { text: "Nur Haare und Nägel.", isCorrect: false },
+                    { text: "Blutgefäße, Nerven und Lymphgefäße.", isCorrect: false },
+                    { text: "Melanozyten, Keratinozyten und Fibroblasten.", isCorrect: false }
+                ],
+                explanation: "Hautanhangsgebilde: Haare (Schutz, Wärme, Tastempfindung), Nägel (Schutz, Hilfsmittel), Talgdrüsen (Talgproduktion für Geschmeidigkeit, Säureschutzmantel), Schweißdrüsen (ekkrin: Thermoregulation; apokrin: Duftsekret)."
             },
             {
-                question: "Wie heißen die Primäreffloreszenzen? (Nennen Sie 3-4)",
-                answer: "Primäreffloreszenzen entstehen direkt auf gesunder Haut. Beispiele:<br><ul><li><b>Macula (Fleck):</b> Farbveränderung im Hautniveau (z.B. Leberfleck, Rötung).</li><li><b>Papula (Knötchen):</b> Kleine, tastbare Erhabenheit (< 1 cm, z.B. bei Akne).</li><li><b>Nodus (Knoten):</b> Größere, tiefere Erhabenheit (> 1 cm).</li><li><b>Urtica (Quaddel):</b> Flüchtige, blassrote, juckende Erhabenheit durch Ödem in der Dermis (typisch für Nesselsucht).</li><li><b>Vesicula (Bläschen):</b> Kleiner, mit Flüssigkeit gefüllter Hohlraum (< 1 cm, z.B. Herpesbläschen).</li><li><b>Bulla (Blase):</b> Großer, mit Flüssigkeit gefüllter Hohlraum (> 1 cm, z.B. Brandblase).</li><li><b>Pustula (Pustel):</b> Mit Eiter gefülltes Bläschen.</li></ul>"
+                question: "Wie heißen die Primäreffloreszenzen? (Nennen Sie Beispiele)",
+                options: [
+                    { text: "Macula (Fleck), Papula (Knötchen), Vesicula (Bläschen), Urtica (Quaddel).", isCorrect: true },
+                    { text: "Squama (Schuppe), Crusta (Kruste), Cicatrix (Narbe), Erosio (Erosion).", isCorrect: false },
+                    { text: "Komedo, Milie, Atherom, Lipom.", isCorrect: false },
+                    { text: "Erythem, Ödem, Pruritus, Dolor.", isCorrect: false }
+                ],
+                explanation: "Primäreffloreszenzen entstehen direkt auf gesunder Haut. Beispiele: Macula (Fleck), Papula (Knötchen), Nodus (Knoten), Urtica (Quaddel), Vesicula (Bläschen), Bulla (Blase), Pustula (Pustel)."
             },
             {
-                question: "Wie heißen die Sekundäreffloreszenzen? (Nennen Sie 3-4)",
-                answer: "Sekundäreffloreszenzen entstehen aus Primäreffloreszenzen oder durch Schädigung der Haut. Beispiele:<br><ul><li><b>Squama (Schuppe):</b> Sichtbare Ablösung von Hornzellen.</li><li><b>Crusta (Kruste):</b> Eingetrocknetes Sekret (Blut, Eiter, Serum).</li><li><b>Erosio (Erosion):</b> Oberflächlicher Substanzdefekt der Epidermis, heilt narbenfrei.</li><li><b>Excoriatio (Exkoriation):</b> Tieferer Substanzdefekt bis in die Dermis (z.B. Kratzspur), kann narbig heilen.</li><li><b>Ulcus (Geschwür):</b> Tiefer Substanzdefekt bis in die Dermis oder Subkutis, heilt mit Narbe.</li><li><b>Cicatrix (Narbe):</b> Ersatzgewebe nach tiefem Substanzdefekt.</li><li><b>Atrophia (Atrophie):</b> Hautverdünnung.</li><li><b>Rhagade/Fissur:</b> Schmaler, spaltförmiger Einriss der Haut.</li></ul>"
+                question: "Wie heißen die Sekundäreffloreszenzen? (Nennen Sie Beispiele)",
+                options: [
+                    { text: "Squama (Schuppe), Crusta (Kruste), Erosio (Erosion), Ulcus (Geschwür), Cicatrix (Narbe).", isCorrect: true },
+                    { text: "Macula (Fleck), Papula (Knötchen), Vesicula (Bläschen), Pustula (Pustel).", isCorrect: false },
+                    { text: "Teleangiektasie, Petechie, Ekchymose, Hämatom.", isCorrect: false },
+                    { text: "Hyperkeratose, Atrophie, Lichenifikation, Sklerose.", isCorrect: false }
+                ],
+                explanation: "Sekundäreffloreszenzen entstehen aus Primäreffloreszenzen oder durch Hautschädigung. Beispiele: Squama (Schuppe), Crusta (Kruste), Erosio (Erosion), Excoriatio (Exkoriation), Ulcus (Geschwür), Cicatrix (Narbe), Atrophia (Atrophie), Rhagade/Fissur."
             },
             {
                 question: "Was versteht man unter Keloid?",
-                answer: "Ein Keloid ist eine überschießende Narbenbildung (Narbenhypertrophie), die über das ursprüngliche Verletzungsgebiet hinauswächst. Es entsteht durch eine übermäßige Produktion von Bindegewebsfasern (Kollagen) während der Wundheilung. Keloide sind oft wulstig, derb, können jucken oder schmerzen und haben eine hohe Rezidivneigung nach Entfernung."
+                options: [
+                    { text: "Eine überschießende Narbenbildung, die über das ursprüngliche Verletzungsgebiet hinauswächst.", isCorrect: true },
+                    { text: "Eine normale, flache Narbe nach einer Verletzung.", isCorrect: false },
+                    { text: "Eine Hautverdünnung (Atrophie).", isCorrect: false },
+                    { text: "Eine gutartige Fettgeschwulst (Lipom).", isCorrect: false }
+                ],
+                explanation: "Ein Keloid ist eine überschießende Narbenbildung (Narbenhypertrophie), die über das ursprüngliche Verletzungsgebiet hinauswächst. Es entsteht durch übermäßige Kollagenproduktion während der Wundheilung."
             },
             {
                 question: "Welche Ursachen der Akne vulgaris gibt es?",
-                answer: "Die Entstehung von Akne vulgaris ist multifaktoriell:<br>1. <b>Androgeneinfluss:</b> Erhöhte Produktion oder Empfindlichkeit gegenüber männlichen Geschlechtshormonen führt zur Vergrößerung der Talgdrüsen und vermehrter Talgproduktion (Seborrhoe).<br>2. <b>Follikuläre Hyperkeratose:</b> Eine Verhornungsstörung im Ausführungsgang des Haarfollikels führt zur Verstopfung (Bildung von Komedonen/Mitessern).<br>3. <b>Bakterielle Besiedlung:</b> Das Bakterium <i>Propionibacterium acnes</i> (Cutibacterium acnes) vermehrt sich im gestauten Talg.<br>4. <b>Entzündungsreaktion:</b> Stoffwechselprodukte der Bakterien und freie Fettsäuren aus dem Talg lösen Entzündungen aus, die zu Papeln und Pusteln führen."
+                options: [
+                    { text: "Androgeneinfluss, follikuläre Hyperkeratose, bakterielle Besiedlung (P. acnes), Entzündungsreaktion.", isCorrect: true },
+                    { text: "Ausschließlich übermäßige Sonneneinstrahlung und falsche Ernährung.", isCorrect: false },
+                    { text: "Eine Virusinfektion und mangelnde Hygiene.", isCorrect: false },
+                    { text: "Eine allergische Reaktion auf Kosmetika.", isCorrect: false }
+                ],
+                explanation: "Ursachen der Akne vulgaris: 1. Androgeneinfluss (erhöhte Talgproduktion). 2. Follikuläre Hyperkeratose (Verstopfung der Follikel). 3. Bakterielle Besiedlung (Propionibacterium acnes). 4. Entzündungsreaktion."
             },
             {
                 question: "Welche klinischen Verlaufsstadien der Akne vulgaris gibt es?",
-                answer: "<ul><li><b>Acne comedonica:</b> Vorherrschen von offenen (schwarzen) und geschlossenen (weißen) Komedonen.</li><li><b>Acne papulopustulosa:</b> Zusätzlich zu Komedonen treten entzündliche Papeln und Pusteln auf.</li><li><b>Acne nodulocystica (oder Acne conglobata als schwerste Form):</b> Zusätzlich tiefe, entzündliche Knoten, Zysten, Abszesse und Fistelgänge, die zu erheblicher Narbenbildung führen können.</li></ul>"
+                options: [
+                    { text: "Acne comedonica, Acne papulopustulosa, Acne nodulocystica/conglobata.", isCorrect: true },
+                    { text: "Stadium I (Rötung), Stadium II (Schuppung), Stadium III (Blasenbildung).", isCorrect: false },
+                    { text: "Akute Phase, chronische Phase, Remissionsphase.", isCorrect: false },
+                    { text: "Leichte Akne, mittlere Akne, schwere Akne, Spätakne.", isCorrect: false }
+                ],
+                explanation: "Klinische Stadien der Akne vulgaris: Acne comedonica (Komedonen), Acne papulopustulosa (zusätzlich Papeln, Pusteln), Acne nodulocystica/conglobata (zusätzlich tiefe Knoten, Zysten, Abszesse)."
             },
             {
                 question: "Welche Auslöser der Rosazea gibt es?",
-                answer: "Die genaue Ursache der Rosazea ist unbekannt, aber verschiedene Faktoren können Schübe auslösen oder verschlimmern:<br><ul><li><b>Genetische Veranlagung</b></li><li><b>Umweltfaktoren:</b> Sonnenlicht (UV-Strahlung), Hitze, Kälte, Wind.</li><li><b>Bestimmte Nahrungsmittel und Getränke:</b> Alkohol (besonders Rotwein), scharfe Gewürze, heiße Getränke (Kaffee, Tee).</li><li><b>Stress und emotionale Faktoren</b></li><li><b>Bestimmte Medikamente</b> (z.B. kortisonhaltige Cremes im Gesicht über längere Zeit)</li><li><b>Demodex-Milben:</b> Eine erhöhte Besiedlung der Haut mit diesen Milben wird diskutiert.</li></ul>"
+                options: [
+                    { text: "Genetik, UV-Strahlung, Hitze/Kälte, Alkohol, scharfe Gewürze, Stress.", isCorrect: true },
+                    { text: "Eine bakterielle Infektion durch Staphylokokken.", isCorrect: false },
+                    { text: "Ausschließlich hormonelle Veränderungen in der Pubertät.", isCorrect: false },
+                    { text: "Kontakt mit Nickel oder anderen Allergenen.", isCorrect: false }
+                ],
+                explanation: "Auslöser der Rosazea: Genetische Veranlagung, Umweltfaktoren (Sonne, Hitze, Kälte), bestimmte Nahrungsmittel/Getränke (Alkohol, scharfe Gewürze, heiße Getränke), Stress, bestimmte Medikamente, Demodex-Milben (diskutiert)."
             },
             {
                 question: "Was ist Psoriasis (Schuppenflechte)?",
-                answer: "Psoriasis ist eine chronisch-entzündliche, nicht ansteckende Hauterkrankung, die meist schubweise verläuft. Sie ist gekennzeichnet durch:<br><ul><li><b>Beschleunigte Zellteilung:</b> Keratinozyten der Epidermis vermehren sich stark beschleunigt (in ca. 4-7 Tagen statt 28 Tagen).</li><li><b>Unvollständige Verhornung:</b> Die Zellen reifen nicht vollständig aus.</li><li><b>Entzündungsreaktion:</b> Infiltration von Immunzellen in die Haut.</li></ul>Typische Symptome sind scharf begrenzte, rote, erhabene Hautstellen (Plaques), die mit silbrig-weißen Schuppen bedeckt sind. Häufig betroffene Stellen sind Ellenbogen, Knie, Kopfhaut und Kreuzbeinregion."
+                options: [
+                    { text: "Eine chronisch-entzündliche Hauterkrankung mit beschleunigter Zellteilung und Schuppenbildung.", isCorrect: true },
+                    { text: "Eine ansteckende Pilzinfektion der Haut.", isCorrect: false },
+                    { text: "Eine allergische Reaktion auf bestimmte Nahrungsmittel.", isCorrect: false },
+                    { text: "Eine vorübergehende Hautrötung durch Stress.", isCorrect: false }
+                ],
+                explanation: "Psoriasis ist eine chronisch-entzündliche, nicht ansteckende Hauterkrankung, gekennzeichnet durch beschleunigte Zellteilung der Keratinozyten, unvollständige Verhornung und Entzündung. Typisch sind scharf begrenzte, rote Plaques mit silbrig-weißen Schuppen."
             },
             {
                 question: "Welche Krankheitsbilder sind mit Depigmentierung assoziiert?",
-                answer: "<ul><li><b>Vitiligo (Weißfleckenkrankheit):</b> Eine erworbene Erkrankung, bei der Melanozyten zerstört werden, was zu scharf begrenzten, weißen Flecken auf der Haut führt. Die Ursache ist oft autoimmun.</li><li><b>Albinismus:</b> Eine angeborene Störung der Melaninsynthese aufgrund eines Gendefekts. Betroffene haben sehr helle Haut, Haare und Augen sowie eine erhöhte Lichtempfindlichkeit.</li><li><b>Postinflammatorische Hypopigmentierung:</b> Nach bestimmten Hautentzündungen oder Verletzungen kann es vorübergehend zu einer Aufhellung der Haut kommen.</li></ul>"
+                options: [
+                    { text: "Vitiligo (Weißfleckenkrankheit), Albinismus.", isCorrect: true },
+                    { text: "Melanom (schwarzer Hautkrebs), Lentigo senilis (Altersflecken).", isCorrect: false },
+                    { text: "Psoriasis (Schuppenflechte), Ekzem.", isCorrect: false },
+                    { text: "Akne vulgaris, Rosazea.", isCorrect: false }
+                ],
+                explanation: "Krankheitsbilder mit Depigmentierung: Vitiligo (erworbener Melanozytenverlust), Albinismus (angeborene Störung der Melaninsynthese), postinflammatorische Hypopigmentierung."
             },
             {
                 question: "Was sind Pyodermien?",
-                answer: "Pyodermien sind eitrige Infektionen der Haut und ihrer Anhangsgebilde, die durch Bakterien verursacht werden. Die häufigsten Erreger sind Staphylokokken (insbesondere <i>Staphylococcus aureus</i>) und Streptokokken."
+                options: [
+                    { text: "Eitrige Infektionen der Haut, meist durch Staphylokokken oder Streptokokken.", isCorrect: true },
+                    { text: "Virale Hauterkrankungen wie Warzen oder Herpes.", isCorrect: false },
+                    { text: "Pilzinfektionen der Haut und Nägel.", isCorrect: false },
+                    { text: "Autoimmunerkrankungen der Haut.", isCorrect: false }
+                ],
+                explanation: "Pyodermien sind eitrige Infektionen der Haut und ihrer Anhangsgebilde, verursacht durch Bakterien (häufigste Erreger: Staphylokokken, Streptokokken)."
             },
             {
                 question: "Was ist ein Furunkel?",
-                answer: "Ein Furunkel ist eine tiefe, eitrige Entzündung eines Haarfollikels und des umliegenden Bindegewebes. Er wird meist durch <i>Staphylococcus aureus</i> verursacht. Ein Furunkel beginnt als schmerzhafter, roter Knoten, der sich mit Eiter füllt und schließlich aufbrechen kann. Mehrere miteinander verschmolzene Furunkel werden als Karbunkel bezeichnet."
+                options: [
+                    { text: "Eine tiefe, eitrige Entzündung eines Haarfollikels und des umgebenden Gewebes.", isCorrect: true },
+                    { text: "Eine oberflächliche Hautabschürfung.", isCorrect: false },
+                    { text: "Ein gutartiger Hauttumor.", isCorrect: false },
+                    { text: "Eine allergische Quaddelbildung.", isCorrect: false }
+                ],
+                explanation: "Ein Furunkel ist eine tiefe, eitrige Entzündung eines Haarfollikels und des umliegenden Bindegewebes, meist durch Staphylococcus aureus verursacht."
             },
             {
                 question: "Nennen Sie 3 Viruserkrankungen der Haut!",
-                answer: "1. <b>Warzen (Verrucae):</b> Verursacht durch Humane Papillomviren (HPV). Beispiele: Verrucae vulgares (gewöhnliche Warzen), Verrucae plantares (Dornwarzen).<br>2. <b>Herpes simplex (HSV):</b> Verursacht Fieberbläschen (meist HSV-1 an Lippen) oder Genitalherpes (meist HSV-2).<br>3. <b>Herpes zoster (Gürtelrose):</b> Verursacht durch das Varizella-Zoster-Virus (VZV), das auch Windpocken verursacht. Reaktivierung des Virus führt zu einem schmerzhaften, bläschenförmigen Ausschlag entlang eines Nervensegments."
+                options: [
+                    { text: "Warzen (HPV), Herpes simplex (HSV), Herpes zoster (Gürtelrose, VZV).", isCorrect: true },
+                    { text: "Impetigo contagiosa, Erysipel, Follikulitis.", isCorrect: false },
+                    { text: "Krätze (Scabies), Pedikulose (Läusebefall), Mykosen (Pilzinfektionen).", isCorrect: false },
+                    { text: "Psoriasis, Neurodermitis, Kontaktekzem.", isCorrect: false }
+                ],
+                explanation: "Viruserkrankungen der Haut: 1. Warzen (Verrucae, durch HPV). 2. Herpes simplex (HSV, Fieberbläschen/Genitalherpes). 3. Herpes zoster (Gürtelrose, durch VZV)."
             },
             {
                 question: "Wie kommt es zur Krätze (Scabies)?",
-                answer: "Krätze wird durch die Krätzmilbe (<i>Sarcoptes scabiei var. hominis</i>) verursacht. Die Übertragung erfolgt meist durch engen, längeren Hautkontakt mit einer infizierten Person. Die befruchteten weiblichen Milben graben Gänge in die oberste Hautschicht (Stratum corneum), legen dort ihre Eier ab und hinterlassen Kot. Die Hautveränderungen (Juckreiz, Papeln, Gänge) sind eine Reaktion auf die Milben und ihre Produkte."
+                options: [
+                    { text: "Durch Befall mit der Krätzmilbe, die Gänge in die Haut gräbt und Eier legt.", isCorrect: true },
+                    { text: "Durch eine bakterielle Infektion nach einem Insektenstich.", isCorrect: false },
+                    { text: "Durch eine allergische Reaktion auf Hausstaub.", isCorrect: false },
+                    { text: "Durch mangelnde Hygiene und übermäßiges Schwitzen.", isCorrect: false }
+                ],
+                explanation: "Krätze (Scabies) wird durch die Krätzmilbe (Sarcoptes scabiei var. hominis) verursacht. Weibliche Milben graben Gänge in die Hornschicht, legen Eier ab und hinterlassen Kot, was zu Juckreiz und Hautveränderungen führt."
             },
             {
                 question: "Was ist ein Basaliom (weißer Hautkrebs)?",
-                answer: "Ein Basaliom (Basalzellkarzinom) ist der häufigste bösartige Hauttumor. Er entsteht aus Zellen der Basalschicht der Epidermis oder der äußeren Haarwurzelscheide. Basaliome wachsen lokal destruktiv (zerstörend), metastasieren aber nur extrem selten. Sie treten meist an sonnenexponierten Hautstellen auf. Typisch ist ein hautfarbener bis rötlicher, oft perlmuttartig glänzender Knoten mit Teleangiektasien (erweiterten Äderchen)."
+                options: [
+                    { text: "Der häufigste bösartige Hauttumor, wächst lokal destruktiv, metastasiert selten.", isCorrect: true },
+                    { text: "Ein gutartiges Muttermal.", isCorrect: false },
+                    { text: "Ein aggressiver, schnell metastasierender schwarzer Hautkrebs.", isCorrect: false },
+                    { text: "Eine entzündliche Hauterkrankung.", isCorrect: false }
+                ],
+                explanation: "Ein Basaliom (Basalzellkarzinom) ist der häufigste bösartige Hauttumor. Er entsteht aus Zellen der Basalschicht, wächst lokal destruktiv, metastasiert aber extrem selten. Tritt meist an sonnenexponierten Stellen auf."
             },
             {
                 question: "Was ist ein Melanom (schwarzer Hautkrebs)? Was ist die ABCDE-Regel?",
-                answer: "Ein Melanom ist ein hochgradig bösartiger Tumor, der von den pigmentbildenden Zellen der Haut (Melanozyten) ausgeht. Es ist seltener als das Basaliom, aber gefährlicher, da es frühzeitig zur Metastasierung neigt.<br><b>Die ABCDE-Regel</b> dient der Früherkennung verdächtiger Pigmentmale:<br><ul><li><b>A</b>symmetrie: Ungleichmäßige Form.</li><li><b>B</b>egrenzung: Unregelmäßig, unscharf, ausgefranst.</li><li><b>C</b>olor (Farbe): Uneinheitliche Färbung, mehrere Farbtöne (braun, schwarz, rot, weiß, blau).</li><li><b>D</b>urchmesser: Größer als 5-6 mm oder Größenzunahme.</li><li><b>E</b>rhabenheit/Entwicklung: Neu entstanden, tastbar erhaben oder schnelle Veränderung in Größe, Form, Farbe.</li></ul>"
+                options: [
+                    { text: "Ein hochgradig bösartiger Tumor der Melanozyten; ABCDE-Regel zur Früherkennung (Asymmetrie, Begrenzung, Color, Durchmesser, Erhabenheit/Entwicklung).", isCorrect: true },
+                    { text: "Ein harmloser Pigmentfleck, der keiner Beobachtung bedarf.", isCorrect: false },
+                    { text: "Ein weißer Hautkrebs, der langsam wächst und gut heilbar ist.", isCorrect: false },
+                    { text: "Eine Regel zur Bestimmung des Hauttyps.", isCorrect: false }
+                ],
+                explanation: "Ein Melanom ist ein hochgradig bösartiger Tumor der Melanozyten, der früh metastasieren kann. Die ABCDE-Regel hilft bei der Früherkennung: Asymmetrie, Begrenzung (unregelmäßig), Color (Farbe, uneinheitlich), Durchmesser (>5-6mm), Erhabenheit/Entwicklung."
             },
             {
                 question: "Was versteht man unter einem Ekzem?",
-                answer: "Ein Ekzem (Dermatitis) ist eine nicht-infektiöse Entzündungsreaktion der Haut. Es gibt verschiedene Formen und Ursachen. Typische Symptome sind Rötung, Schwellung, Juckreiz, Bläschenbildung, Nässen, Krustenbildung und Schuppung. Ekzeme können akut oder chronisch verlaufen."
+                options: [
+                    { text: "Eine nicht-infektiöse Entzündungsreaktion der Haut mit Symptomen wie Rötung, Juckreiz, Bläschen.", isCorrect: true },
+                    { text: "Eine eitrige bakterielle Infektion der Haut.", isCorrect: false },
+                    { text: "Eine ansteckende Viruserkrankung.", isCorrect: false },
+                    { text: "Eine gutartige Neubildung von Hautgewebe.", isCorrect: false }
+                ],
+                explanation: "Ein Ekzem (Dermatitis) ist eine nicht-infektiöse Entzündungsreaktion der Haut. Typische Symptome: Rötung, Schwellung, Juckreiz, Bläschenbildung, Nässen, Krustenbildung, Schuppung."
             },
             {
                 question: "Was ist Neurodermitis (Atopische Dermatitis)?",
-                answer: "Neurodermitis ist eine chronische, schubweise verlaufende Hauterkrankung, die zu den atopischen Erkrankungen zählt (wie Heuschnupfen, allergisches Asthma). Sie ist gekennzeichnet durch eine gestörte Hautbarrierefunktion und eine Überempfindlichkeit des Immunsystems. Typische Symptome sind sehr trockene Haut, starker Juckreiz und Ekzeme, die je nach Alter an unterschiedlichen Körperstellen auftreten (z.B. Beugenekzeme bei Kindern, Gesicht und Hände bei Erwachsenen)."
+                options: [
+                    { text: "Eine chronische, schubweise verlaufende Hauterkrankung mit gestörter Barrierefunktion und starkem Juckreiz.", isCorrect: true },
+                    { text: "Eine akute allergische Reaktion auf ein bestimmtes Lebensmittel.", isCorrect: false },
+                    { text: "Eine durch Bakterien verursachte Hautinfektion.", isCorrect: false },
+                    { text: "Eine Form von Hautkrebs.", isCorrect: false }
+                ],
+                explanation: "Neurodermitis (Atopische Dermatitis) ist eine chronische, schubweise verlaufende Hauterkrankung, die zu den atopischen Erkrankungen zählt. Gekennzeichnet durch gestörte Hautbarriere, Überempfindlichkeit des Immunsystems, trockene Haut, starken Juckreiz und Ekzeme."
             },
             {
                 question: "Beschreiben Sie einen Nagelpilz (Onychomykose)!",
-                answer: "Onychomykose ist eine Pilzinfektion der Nägel, meist der Zehennägel. Verursacher sind oft Dermatophyten. Die Infektion beginnt häufig am freien Nagelrand oder seitlich und breitet sich langsam aus. Typische Anzeichen sind:<br><ul><li>Verfärbung des Nagels (weißlich, gelblich, bräunlich)</li><li>Verdickung der Nagelplatte</li><li>Brüchigkeit, Brüchigwerden des Nagels</li><li>Ablösung des Nagels vom Nagelbett (Onycholyse)</li><li>Ansammlung von krümeligem Material unter dem Nagel</li></ul>"
+                options: [
+                    { text: "Eine Pilzinfektion der Nägel, oft mit Verfärbung, Verdickung und Brüchigkeit.", isCorrect: true },
+                    { text: "Eine bakterielle Entzündung des Nagelwalls.", isCorrect: false },
+                    { text: "Eine Verformung des Nagels durch ein Trauma.", isCorrect: false },
+                    { text: "Ein eingewachsener Nagel.", isCorrect: false }
+                ],
+                explanation: "Onychomykose ist eine Pilzinfektion der Nägel (meist Zehennägel), oft durch Dermatophyten. Typische Anzeichen: Verfärbung, Verdickung, Brüchigkeit, Ablösung des Nagels, krümeliges Material unter dem Nagel."
             }
         ];
 
-        const container = document.getElementById('flashcard-container');
 
-        flashcardsData.forEach(data => {
-            const card = document.createElement('div');
-            card.className = 'flashcard';
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(flashcardsData.length).fill(null); // To store user's selection for each question
+        let questionAttempted = new Array(flashcardsData.length).fill(false); // To track if a question has been attempted
 
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'flashcard-question';
-            questionDiv.innerHTML = `<span>${data.question}</span><span class="arrow text-2xl">&# récit;</span>`; // Using right arrow as default
+        const questionCounterElement = document.getElementById('question-counter');
+        const questionTitleElement = document.getElementById('question-title');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackAreaElement = document.getElementById('feedback-area');
+        const feedbackTextElement = document.getElementById('feedback-text');
+        const explanationAreaElement = document.getElementById('explanation-area');
+        const explanationTextElement = document.getElementById('explanation-text');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
 
-            const answerDiv = document.createElement('div');
-            answerDiv.className = 'flashcard-answer';
-            answerDiv.innerHTML = data.answer;
+        function loadQuestion(index) {
+            const questionData = flashcardsData[index];
+            questionCounterElement.textContent = `Frage ${index + 1} von ${flashcardsData.length}`;
+            questionTitleElement.innerHTML = `${index + 1}. ${questionData.question}`;
+            
+            optionsContainer.innerHTML = ''; // Clear previous options
+            questionData.options.forEach((option, i) => {
+                const optionId = `q${index}_option${i}`;
+                const label = document.createElement('label');
+                label.htmlFor = optionId;
+                label.className = 'block p-3 border border-gray-300 rounded-md hover:bg-blue-100 cursor-pointer';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.id = optionId;
+                radio.name = `question${index}`;
+                radio.value = i;
+                radio.className = 'mr-2';
+                if (questionAttempted[index]) {
+                    radio.disabled = true;
+                }
+                
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(option.text));
+                optionsContainer.appendChild(label);
+            });
 
-            card.appendChild(questionDiv);
-            card.appendChild(answerDiv);
-            container.appendChild(card);
+            // Restore previous selection if exists and question was attempted
+            if (questionAttempted[index] && userAnswers[index] !== null) {
+                const selectedRadio = optionsContainer.querySelector(`input[value="${userAnswers[index]}"]`);
+                if (selectedRadio) {
+                    selectedRadio.checked = true;
+                }
+                showResult(index, parseInt(userAnswers[index])); // Show previous result
+            } else {
+                feedbackAreaElement.classList.add('hidden');
+                explanationAreaElement.classList.add('hidden');
+                checkAnswerBtn.disabled = false;
+                 optionsContainer.querySelectorAll('input[type="radio"]').forEach(rb => rb.disabled = false);
+                optionsContainer.querySelectorAll('label').forEach(lbl => {
+                    lbl.classList.remove('correct', 'incorrect');
+                });
+            }
+            
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === flashcardsData.length - 1;
+            prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+            prevBtn.classList.toggle('cursor-not-allowed', prevBtn.disabled);
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+            nextBtn.classList.toggle('cursor-not-allowed', nextBtn.disabled);
+        }
 
-            questionDiv.addEventListener('click', () => {
-                const arrow = questionDiv.querySelector('.arrow');
-                questionDiv.classList.toggle('open');
-                answerDiv.classList.toggle('open');
-                arrow.classList.toggle('open');
-                 // Change arrow direction
-                if (arrow.classList.contains('open')) {
-                    arrow.innerHTML = '&#x279C;'; // Pointing down arrow when open (or use another suitable one)
-                } else {
-                    arrow.innerHTML = '&# récit;'; // Pointing right arrow when closed
+        function showResult(questionIdx, selectedOptionIndex) {
+            const questionData = flashcardsData[questionIdx];
+            const correctOptionIndex = questionData.options.findIndex(opt => opt.isCorrect);
+
+            optionsContainer.querySelectorAll('label').forEach((label, i) => {
+                label.classList.remove('correct', 'incorrect'); // Clear previous styling
+                const radio = label.querySelector('input[type="radio"]');
+                radio.disabled = true;
+
+                if (i === correctOptionIndex) {
+                    label.classList.add('correct');
+                }
+                if (i === selectedOptionIndex && i !== correctOptionIndex) {
+                    label.classList.add('incorrect');
                 }
             });
+            
+            if (selectedOptionIndex === correctOptionIndex) {
+                feedbackTextElement.textContent = 'Richtig!';
+                feedbackTextElement.className = 'feedback-text correct';
+            } else {
+                feedbackTextElement.textContent = 'Falsch.';
+                feedbackTextElement.className = 'feedback-text incorrect';
+            }
+            
+            feedbackAreaElement.classList.remove('hidden');
+            explanationTextElement.innerHTML = questionData.explanation;
+            explanationAreaElement.classList.remove('hidden');
+            checkAnswerBtn.disabled = true;
+        }
+
+        checkAnswerBtn.addEventListener('click', () => {
+            const selectedOption = optionsContainer.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+            if (selectedOption) {
+                const selectedOptionIndex = parseInt(selectedOption.value);
+                userAnswers[currentQuestionIndex] = selectedOptionIndex;
+                questionAttempted[currentQuestionIndex] = true;
+                showResult(currentQuestionIndex, selectedOptionIndex);
+            } else {
+                // Optional: Show a message to select an option
+                feedbackTextElement.textContent = 'Bitte wählen Sie eine Antwort aus.';
+                feedbackTextElement.className = 'feedback-text text-yellow-600';
+                feedbackAreaElement.classList.remove('hidden');
+                explanationAreaElement.classList.add('hidden');
+            }
         });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < flashcardsData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        // Initial load
+        loadQuestion(currentQuestionIndex);
     </script>
 </body>
 </html>
